@@ -1,0 +1,10 @@
+{
+    "clientId": "ID",
+    "clientSecret": "SECRET",
+    "channels": [
+        "fortnite",
+        "rezonfn",
+        "heystani",
+        "amar"
+    ]
+} 

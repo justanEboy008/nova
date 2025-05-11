@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>NOVA Interface</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --apple-blue: #0071e3;
+                --apple-gray: #86868b;
+                --apple-dark: #1d1d1f;
+                --apple-light: #f5f5f7;
+            }
+
+            body {
+                background: linear-gradient(135deg, #000000 0%, #1d1d1f 100%);
+                color: var(--apple-light);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                min-height: 100vh;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .glass-card {
+                background: rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 1.5rem;
+                min-height: 500px;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            .weather-card {
+                background: rgba(255, 255, 255, 0.08);
+                padding: 2rem;
+                border-radius: 1.5rem;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+            }
+
+            .weather-section {
+                display: none;
+                gap: 2rem;
+                width: 100%;
+                flex: 1;
+                padding: 1rem;
+                flex-direction: column;
+            }
+
+            .weather-section.active {
+                display: flex;
+            }
+
+            @media (max-width: 1024px) {
+                .weather-section {
+                    flex-direction: column;
+                    gap: 1.5rem;
+                }
+
+                .current-weather, .forecast-section {
+                    min-width: 100%;
+                }
+
+                .glass-card {
+                    min-height: auto;
+                }
+            }
+
+            .current-weather {
+                flex: 1;
+                min-width: 300px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .forecast-section {
+                flex: 2;
+                min-width: 400px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .forecast-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                margin-top: 2rem;
+                width: 100%;
+            }
+
+            .forecast-card {
+                background: rgba(255, 255, 255, 0.08);
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .forecast-card:hover {
+                transform: translateY(-4px);
+                background: rgba(255, 255, 255, 0.12);
+            }
+
+            .forecast-info {
+                flex: 1;
+                text-align: left;
+            }
+
+            .forecast-info p {
+                margin-bottom: 0.5rem;
+            }
+
+            .forecast-icon {
+                width: 60px;
+                height: 60px;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            }
+
+            .weather-card h2 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #f1f1f1;
+                margin-bottom: 1rem;
+            }
+
+            .weather-info {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+                align-items: center;
+                margin-top: 2rem;
+            }
+
+            .weather-info p {
+                font-size: 1.25rem;
+                font-weight: 500;
+                color: #f1f1f1;
+            }
+
+            .forecast-card p {
+                font-size: 1rem;
+                font-weight: 500;
+                color: #e2e8f0;
+            }
+
+            .icon {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 1rem;
+                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            }
+
+            .log-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            @media (max-width: 1024px) {
+                .log-container {
+                    max-width: 100%;
+                }
+            }
+
+            .log-card {
+                background: rgba(43, 51, 63, 0.6);
+                padding: 1.5rem;
+                border-radius: 1rem;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(5px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                transition: transform 0.2s ease;
+                width: 100%;
+            }
+
+            @media (max-width: 768px) {
+                .log-card {
+                    padding: 1rem;
+                }
+
+                .log-card p {
+                    font-size: 0.9rem;
+                }
+            }
+
+            .log-card p {
+                font-size: 1rem;
+                color: #e2e8f0;
+                margin-bottom: 0.5rem;
+            }
+
+            .log-card .timestamp {
+                font-size: 0.875rem;
+                color: #94a3b8;
+            }
+
+            .avatar-container {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto 2rem;
+                filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+            }
+
+            @media (max-width: 480px) {
+                .avatar-container {
+                    width: 150px;
+                    height: 150px;
+                    margin-bottom: 1rem;
+                }
+            }
+
+            .avatar-circle {
+                transition: all 0.3s ease;
+            }
+
+            .status-indicator {
+                background: rgba(255, 255, 255, 0.08);
+                padding: 0.75rem 1.5rem;
+                border-radius: 2rem;
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                display: inline-block;
+                margin: 1rem auto;
+                font-weight: 500;
+                letter-spacing: -0.01em;
+            }
+
+            /* Animation styles */
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+
+            @keyframes wave {
+                0% { transform: translateY(0); }
+                50% { transform: translateY(-5px); }
+                100% { transform: translateY(0); }
+            }
+
+            @keyframes blink {
+                0% { opacity: 1; }
+                50% { opacity: 0.3; }
+                100% { opacity: 1; }
+            }
+
+            .speaking .mouth {
+                animation: wave 0.5s ease-in-out infinite;
+            }
+
+            .listening .eyes {
+                animation: blink 1s ease-in-out infinite;
+            }
+
+            .active .avatar-circle {
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #fff 0%, #86868b 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin: 1.5rem 0;
+                text-align: center;
+                letter-spacing: -0.02em;
+            }
+
+            #current-weather-temp {
+                font-size: 4rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin: 1rem 0;
+                background: linear-gradient(135deg, #fff 0%, #86868b 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            #current-weather-desc {
+                font-size: 1.5rem;
+                color: var(--apple-gray);
+                letter-spacing: -0.01em;
+            }
+
+            @media (max-width: 768px) {
+                .section-title {
+                    font-size: 2rem;
+                }
+
+                .forecast-card {
+                    padding: 1rem;
+                }
+
+                .forecast-icon {
+                    width: 50px;
+                    height: 50px;
+                }
+
+                #current-weather-temp {
+                    font-size: 3rem;
+                }
+
+                #current-weather-desc {
+                    font-size: 1.25rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                body {
+                    padding: 1rem;
+                }
+
+                .weather-section {
+                    padding: 0.5rem;
+                }
+
+                .weather-card {
+                    padding: 1rem;
+                }
+
+                .section-title {
+                    font-size: 1.5rem;
+                }
+
+                .forecast-card {
+                    flex-direction: column;
+                    text-align: center;
+                    gap: 0.5rem;
+                }
+
+                .forecast-info {
+                    text-align: center;
+                }
+
+                .forecast-icon {
+                    width: 40px;
+                    height: 40px;
+                }
+
+                #current-weather-temp {
+                    font-size: 2.5rem;
+                }
+
+                .icon {
+                    width: 60px;
+                    height: 60px;
+                }
+            }
+
+            /* Twitch Stream Card Styles */
+            .twitch-card {
+                background: rgba(255, 255, 255, 0.08);
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 100%;
+                display: flex;
+                gap: 1.5rem;
+                align-items: center;
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            .twitch-card:hover {
+                transform: translateY(-4px);
+                background: rgba(255, 255, 255, 0.12);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            }
+
+            .stream-preview {
+                width: 160px;
+                height: 90px;
+                border-radius: 1rem;
+                object-fit: cover;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            }
+
+            .stream-info {
+                flex: 1;
+            }
+
+            .stream-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #fff;
+                margin-bottom: 0.5rem;
+                letter-spacing: -0.01em;
+            }
+
+            .stream-details {
+                display: flex;
+                gap: 1rem;
+                color: var(--apple-gray);
+                font-size: 0.9rem;
+                letter-spacing: -0.01em;
+            }
+
+            .viewer-count {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                color: var(--apple-blue);
+            }
+
+            .live-indicator {
+                background: #ff3b30;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 0.5rem;
+                animation: blink 1s ease-in-out infinite;
+            }
+
+            @media (max-width: 480px) {
+                .twitch-card {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .stream-preview {
+                    width: 100%;
+                    height: auto;
+                }
+
+                .stream-details {
+                    justify-content: center;
+                }
+            }
+
+            .streams-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                width: 100%;
+            }
+
+            @media (max-width: 768px) {
+                .streams-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Apple-style button */
+            .apple-button {
+                background: var(--apple-blue);
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: 1.5rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+                letter-spacing: -0.01em;
+            }
+
+            .apple-button:hover {
+                background: #0077ed;
+                transform: translateY(-1px);
+            }
+
+            .main-content {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                width: 100%;
+            }
+
+            @media (min-width: 1024px) {
+                .main-content {
+                    grid-template-columns: 1fr 1fr;
+                }
+
+                .logs-section {
+                    grid-column: 1;
+                }
+
+                .calendar-section {
+                    grid-column: 2;
+                }
+
+                .weather-section {
+                    grid-column: 2;
+                }
+
+                .twitch-section {
+                    grid-column: 1 / -1;
+                }
+            }
+
+            .calendar-card {
+                background: rgba(255, 255, 255, 0.08);
+                padding: 1.5rem;
+                border-radius: 1rem;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .calendar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .calendar-nav {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .calendar-nav button {
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                color: white;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .calendar-nav button:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .calendar-nav button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .calendar-day.has-event {
+                position: relative;
+            }
+
+            .calendar-day.has-event::after {
+                content: '';
+                position: absolute;
+                bottom: 2px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 4px;
+                height: 4px;
+                background: var(--apple-blue);
+                border-radius: 50%;
+            }
+
+            .event-form {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 1.5rem;
+                border-radius: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .event-form input,
+            .event-form textarea {
+                width: 100%;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 0.5rem;
+                padding: 0.75rem;
+                color: white;
+                margin-bottom: 1rem;
+            }
+
+            .event-form input:focus,
+            .event-form textarea:focus {
+                outline: none;
+                border-color: var(--apple-blue);
+            }
+
+            .event-form button {
+                background: var(--apple-blue);
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .event-form button:hover {
+                background: #0077ed;
+            }
+
+            .event-actions {
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .event-actions button {
+                background: none;
+                border: none;
+                color: var(--apple-gray);
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: 0.25rem;
+                transition: all 0.2s ease;
+            }
+
+            .event-actions button:hover {
+                color: white;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .calendar-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #fff;
+                letter-spacing: -0.01em;
+            }
+
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .calendar-day-header {
+                text-align: center;
+                font-size: 0.875rem;
+                color: var(--apple-gray);
+                padding: 0.5rem;
+                font-weight: 500;
+            }
+
+            .calendar-day {
+                aspect-ratio: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.875rem;
+                color: var(--apple-light);
+                border-radius: 50%;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .calendar-day:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .calendar-day.today {
+                background: var(--apple-blue);
+                color: white;
+            }
+
+            .calendar-day.other-month {
+                color: var(--apple-gray);
+                opacity: 0.5;
+            }
+
+            .calendar-events {
+                margin-top: 1.5rem;
+            }
+
+            .calendar-event {
+                padding: 0.75rem;
+                border-radius: 0.75rem;
+                background: rgba(255, 255, 255, 0.05);
+                margin-bottom: 0.75rem;
+                transition: all 0.2s ease;
+            }
+
+            .calendar-event:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .event-time {
+                font-size: 0.875rem;
+                color: var(--apple-gray);
+                margin-bottom: 0.25rem;
+            }
+
+            .event-title {
+                font-size: 1rem;
+                color: #fff;
+                font-weight: 500;
+            }
+
+            @media (max-width: 1024px) {
+                .calendar-grid {
+                    gap: 0.25rem;
+                }
+
+                .calendar-day {
+                    font-size: 0.75rem;
+                }
+            }
+        </style>
+    </head>
+    <body class="p-8">
+        <div class="max-w-6xl mx-auto space-y-8">
+            <!-- Header Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
+                    NOVA AI Assistant
+                </h1>
+                <p class="text-gray-400 text-lg tracking-tight">Your intelligent voice companion</p>
+            </div>
+
+            <!-- Nova Avatar -->
+            <div id="novaAvatar" class="avatar-container">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="listeningGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#2c5282;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="speakingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#48bb78;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#2f855a;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="avatar-circle" cx="100" cy="100" r="90" fill="url(#listeningGradient)" />
+                    <g class="eyes">
+                        <circle cx="80" cy="80" r="10" fill="white" />
+                        <circle cx="120" cy="80" r="10" fill="white" />
+                    </g>
+                    <path class="mouth" d="M100 60 C 130 60, 130 100, 100 100 C 70 100, 70 60, 100 60" fill="white" />
+                </svg>
+            </div>
+
+            <!-- Status Indicator -->
+            <div class="text-center">
+                <div id="status" class="status-indicator text-lg font-semibold text-gray-300"></div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Logs Section -->
+                <div class="glass-card p-6 logs-section">
+                    <h2 class="section-title">Interaction Log</h2>
+                    <div id="log" class="space-y-4"></div>
+                </div>
+
+                <!-- Calendar Section -->
+                <div class="glass-card p-6 calendar-section">
+                    <h2 class="section-title">Calendar</h2>
+                    <div class="calendar-card">
+                        <div class="calendar-header">
+                            <div class="calendar-nav">
+                                <button id="prevMonth" class="nav-button">←</button>
+                                <div class="calendar-title" id="current-month">September 2024</div>
+                                <button id="nextMonth" class="nav-button">→</button>
+                            </div>
+                            <button id="addEventBtn" class="apple-button">Add Event</button>
+                        </div>
+                        <div class="calendar-grid" id="calendar-days">
+                            <!-- Calendar days will be inserted here -->
+                        </div>
+                        <div class="calendar-events" id="calendar-events">
+                            <!-- Events will be inserted here -->
+                        </div>
+                        <div id="eventForm" class="event-form" style="display: none;">
+                            <input type="text" id="eventTitle" placeholder="Event Title" required>
+                            <input type="date" id="eventDate" required>
+                            <input type="time" id="eventTime" required>
+                            <textarea id="eventDescription" placeholder="Event Description" rows="3"></textarea>
+                            <button id="saveEvent">Save Event</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Section -->
+                <div id="weather-container" class="glass-card weather-section" style="display: none;">
+                    <h2 class="section-title">Weather Information</h2>
+                    <div id="weather" class="weather-section">
+                        <!-- Current Weather -->
+                        <div class="current-weather">
+                            <div class="weather-card space-y-4">
+                                <h2 class="text-2xl font-semibold">🌤 Current Weather</h2>
+                                <div id="weather-current" class="weather-info">
+                                    <img id="current-weather-icon" src="" alt="Weather Icon" class="icon" />
+                                    <p id="current-weather-temp" class="text-4xl font-bold"></p>
+                                    <p id="current-weather-desc" class="text-lg text-gray-300"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Forecast -->
+                        <div class="forecast-section">
+                            <div class="weather-card">
+                                <h2 class="text-2xl font-semibold mb-6">🔮 Forecast</h2>
+                                <div id="forecast" class="forecast-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Twitch Stream Section -->
+                <div class="glass-card twitch-section">
+                    <h2 class="section-title">Live Streams</h2>
+                    <div id="twitch-stream" class="p-6">
+                        <div id="streams-grid" class="streams-grid">
+                            <!-- Stream cards will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Status update function
+            async function updateStatus() {
+                try {
+                    const response = await fetch('/status');
+                    const status = await response.json();
+                    const statusElement = document.getElementById('status');
+                    const avatarCircle = document.querySelector('.avatar-circle');
+                    const avatarContainer = document.getElementById('novaAvatar');
+                    
+                    statusElement.textContent = `Status: ${status.status}`;
+                    
+                    // Remove all animation classes
+                    avatarContainer.classList.remove('speaking', 'listening', 'active');
+                    
+                    // Update avatar gradient and animations based on status
+                    if (status.status === 'listening') {
+                        avatarCircle.setAttribute('fill', 'url(#listeningGradient)');
+                        avatarContainer.classList.add('listening', 'active');
+                    } else if (status.status === 'speaking') {
+                        avatarCircle.setAttribute('fill', 'url(#speakingGradient)');
+                        avatarContainer.classList.add('speaking', 'active');
+                    }
+                } catch (err) {
+                    console.error('Error fetching status:', err);
+                }
+            }
+
+            // Log fetching and display
+            async function fetchLogs() {
+                try {
+                    const response = await fetch("/logs");
+                    const logs = await response.json();
+                    displayLogs(logs);
+                } catch (err) {
+                    console.error("Error fetching logs:", err);
+                }
+            }
+
+            function displayLogs(logs) {
+                const logContainer = document.getElementById("log");
+                const weatherContainer = document.getElementById("weather-container");
+                const weatherCurrent = document.getElementById("weather-current");
+                const forecastContainer = document.getElementById("forecast");
+
+                logContainer.innerHTML = "";
+                weatherCurrent.innerHTML = "";
+                forecastContainer.innerHTML = "";
+
+                const latest = logs[logs.length - 1];
+                if (!latest) return;
+
+                // Main interaction log
+                const logCard = document.createElement("div");
+                logCard.className = "log-card";
+
+                logCard.innerHTML = `
+                    <p><span class="font-semibold text-blue-400">🧠 NOVA:</span> ${latest.response}</p>
+                    <p><span class="font-semibold text-green-400">🗣️ Command:</span> ${latest.command}</p>
+                    <p><span class="font-semibold text-purple-400">👤 User Speaking:</span> ${latest.is_user_talking}</p>
+                    <p class="timestamp"><span class="text-gray-400 text-sm">${latest.timestamp}</span></p>
+                `;
+                logContainer.appendChild(logCard);
+
+                // Weather
+                if (latest.isWeather) {
+                    weatherContainer.style.display = 'block';
+                    if (latest.response && latest.icon) {
+                        const [temperature, ...descParts] = latest.response.split(" ");
+                        const description = descParts.join(" ");
+
+                        document.getElementById("current-weather-icon").src = latest.icon.startsWith("//")
+                            ? "https:" + latest.icon
+                            : latest.icon;
+                        document.getElementById("current-weather-temp").textContent = `${temperature}`;
+                        document.getElementById("current-weather-desc").textContent = description;
+                    }
+
+                    // Forecast
+                    if (Array.isArray(latest.forecast)) {
+                        latest.forecast.forEach((day) => {
+                            const card = document.createElement("div");
+                            card.className = "forecast-card";
+                            const iconUrl = day.icon?.startsWith("//") ? "https:" + day.icon : day.icon;
+
+                            card.innerHTML = `
+                                <img src="${iconUrl}" class="forecast-icon" alt="Forecast Icon" />
+                                <div class="forecast-info">
+                                    <p class="font-semibold text-blue-300 text-xl">${day.date}</p>
+                                    <p class="text-gray-300 text-lg">${day.weather}</p>
+                                    <p class="text-2xl font-bold mt-2">${day.temperature}</p>
+                                </div>
+                            `;
+                            forecastContainer.appendChild(card);
+                        });
+                    }
+                } else {
+                    weatherContainer.style.display = 'none';
+                }
+            }
+            
+            // Twitch Stream Updates
+            async function updateTwitchStream() {
+                try {
+                    const response = await fetch('/twitch-stream');
+                    const streams = await response.json();
+                    const streamsGrid = document.getElementById('streams-grid');
+                    
+                    streamsGrid.innerHTML = '';
+                    
+                    if (streams.length === 0) {
+                        const noStreamsCard = document.createElement('div');
+                        noStreamsCard.className = 'twitch-card';
+                        noStreamsCard.innerHTML = `
+                            <div class="stream-info">
+                                <h3 class="stream-title">No live streams at the moment</h3>
+                            </div>
+                        `;
+                        streamsGrid.appendChild(noStreamsCard);
+                        return;
+                    }
+
+                    streams.forEach(stream => {
+                        const streamCard = document.createElement('a');
+                        streamCard.className = 'twitch-card';
+                        streamCard.href = `https://twitch.tv/${stream.streamerName.toLowerCase()}`;
+                        streamCard.target = '_blank';
+                        streamCard.rel = 'noopener noreferrer';
+                        
+                        streamCard.innerHTML = `
+                            <img src="${stream.previewUrl}" alt="Stream Preview" class="stream-preview">
+                            <div class="stream-info">
+                                <h3 class="stream-title">
+                                    <span class="live-indicator"></span>
+                                    <span>${stream.title}</span>
+                                </h3>
+                                <div class="stream-details">
+                                    <span>${stream.streamerName}</span>
+                                    <span>•</span>
+                                    <span>${stream.gameName}</span>
+                                    <span>•</span>
+                                    <span class="viewer-count">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <span>${stream.viewerCount.toLocaleString()}</span> viewers
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        streamsGrid.appendChild(streamCard);
+                    });
+                } catch (err) {
+                    console.error('Error fetching Twitch streams:', err);
+                }
+            }
+            
+            // Calendar functionality
+            let currentDate = new Date();
+            let selectedDate = null;
+
+            function initCalendar() {
+                updateCalendar();
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    updateCalendar();
+                });
+                
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    updateCalendar();
+                });
+                
+                document.getElementById('addEventBtn').addEventListener('click', () => {
+                    const eventForm = document.getElementById('eventForm');
+                    eventForm.style.display = eventForm.style.display === 'none' ? 'block' : 'none';
+                });
+                
+                document.getElementById('saveEvent').addEventListener('click', saveEvent);
+            }
+
+            async function updateCalendar() {
+                const calendarDays = document.getElementById('calendar-days');
+                const currentMonth = document.getElementById('current-month');
+                
+                // Set month and year
+                currentMonth.textContent = currentDate.toLocaleString('default', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+                
+                // Clear existing calendar
+                calendarDays.innerHTML = '';
+                
+                // Add day headers
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                days.forEach(day => {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'calendar-day-header';
+                    dayHeader.textContent = day;
+                    calendarDays.appendChild(dayHeader);
+                });
+                
+                // Get first day of month and total days
+                const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+                const totalDays = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+                
+                // Add empty cells for days before first of month
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day other-month';
+                    calendarDays.appendChild(emptyDay);
+                }
+                
+                // Add days of month
+                for (let day = 1; day <= totalDays; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                    
+                    if (date.toDateString() === new Date().toDateString()) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    dayElement.textContent = day;
+                    dayElement.addEventListener('click', () => selectDate(date));
+                    calendarDays.appendChild(dayElement);
+                }
+                
+                // Fetch and display events
+                await fetchEvents();
+            }
+
+            async function fetchEvents() {
+                try {
+                    const response = await fetch(`/calendar-events?month=${currentDate.getMonth()}&year=${currentDate.getFullYear()}`);
+                    const events = await response.json();
+                    
+                    // Update calendar days with event indicators
+                    const days = document.querySelectorAll('.calendar-day');
+                    days.forEach(day => {
+                        day.classList.remove('has-event');
+                        const dayNumber = parseInt(day.textContent);
+                        if (!isNaN(dayNumber)) {
+                            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNumber);
+                            const hasEvent = events.some(event => new Date(event.date).toDateString() === date.toDateString());
+                            if (hasEvent) {
+                                day.classList.add('has-event');
+                            }
+                        }
+                    });
+                    
+                    // Display events
+                    const eventsContainer = document.getElementById('calendar-events');
+                    eventsContainer.innerHTML = '';
+                    
+                    events.forEach(event => {
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'calendar-event';
+                        eventElement.innerHTML = `
+                            <div class="event-time">${event.time}</div>
+                            <div class="event-title">${event.title}</div>
+                            ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+                            <div class="event-actions">
+                                <button onclick="deleteEvent('${event.id}')">Delete</button>
+                            </div>
+                        `;
+                        eventsContainer.appendChild(eventElement);
+                    });
+                } catch (error) {
+                    console.error('Error fetching events:', error);
+                }
+            }
+
+            async function saveEvent() {
+                const title = document.getElementById('eventTitle').value;
+                const date = document.getElementById('eventDate').value;
+                const time = document.getElementById('eventTime').value;
+                const description = document.getElementById('eventDescription').value;
+                
+                if (!title || !date || !time) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/calendar-events', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ title, date, time, description })
+                    });
+                    
+                    if (response.ok) {
+                        document.getElementById('eventForm').style.display = 'none';
+                        document.getElementById('eventTitle').value = '';
+                        document.getElementById('eventDate').value = '';
+                        document.getElementById('eventTime').value = '';
+                        document.getElementById('eventDescription').value = '';
+                        await updateCalendar();
+                    }
+                } catch (error) {
+                    console.error('Error saving event:', error);
+                }
+            }
+
+            async function deleteEvent(id) {
+                if (!confirm('Are you sure you want to delete this event?')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/calendar-events/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        await updateCalendar();
+                    }
+                } catch (error) {
+                    console.error('Error deleting event:', error);
+                }
+            }
+
+            function selectDate(date) {
+                selectedDate = date;
+                document.getElementById('eventDate').value = date.toISOString().split('T')[0];
+                document.getElementById('eventForm').style.display = 'block';
+            }
+
+            // Initialize
+            setInterval(fetchLogs, 2000);
+            setInterval(updateStatus, 1000);
+            setInterval(updateTwitchStream, 30000);
+            fetchLogs();
+            updateStatus();
+            updateTwitchStream();
+            initCalendar();
+        </script>
+    </body>
+</html>
